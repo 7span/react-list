@@ -6,7 +6,7 @@ export const ReactListPerPage = memo(
     const { listState } = useListContext();
     const { data, pagination, setPerPage, loader, error } = listState;
     const { perPage } = pagination;
-    const { initialLoading, isLoading } = loader;
+    const { initialLoading } = loader;
 
     const styles = useMemo(
       () => ({

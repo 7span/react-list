@@ -30,7 +30,6 @@ export const ReactListInitialLoader = memo(({ children }) => {
   const scope = useMemo(
     () => ({
       loading: initialLoading,
-      styles,
     }),
     [initialLoading]
   );

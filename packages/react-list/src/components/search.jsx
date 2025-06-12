@@ -1,10 +1,9 @@
-import { memo, useEffect, useRef, useState, useTransition } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useListContext } from "../context/list-provider";
 
 export const ReactListSearch = memo(({ children, debounceTime = 500 }) => {
   const { listState } = useListContext();
   const { search, setSearch } = listState;
-  const [isPending, startTransition] = useTransition();
   const [localSearch, setLocalSearch] = useState(search ?? "");
   const debounceTimerRef = useRef(null);
 
@@ -25,9 +24,7 @@ export const ReactListSearch = memo(({ children, debounceTime = 500 }) => {
 
     // Set a new timer
     debounceTimerRef.current = setTimeout(() => {
-      startTransition(() => {
-        setSearch(value);
-      });
+      setSearch(value);
     }, debounceTime);
   };
 
@@ -59,7 +56,6 @@ export const ReactListSearch = memo(({ children, debounceTime = 500 }) => {
   const scope = {
     search: localSearch,
     setSearch: handleChange,
-    isPending,
   };
 
   if (children) {
@@ -75,14 +71,6 @@ export const ReactListSearch = memo(({ children, debounceTime = 500 }) => {
         placeholder="Search..."
         style={searchStyles.input}
       />
-      {isPending && (
-        <div
-          className="search-indicator"
-          style={{ fontSize: "12px", color: "#888", marginTop: "4px" }}
-        >
-          Searching...
-        </div>
-      )}
     </div>
   );
 });

@@ -150,7 +150,15 @@ const ReactList = ({
         setState(newState);
         fetchData({}, newState);
       },
-
+      updateItemById: (item, id) => {
+        const newItems = state.items.map((i) => {
+          if (i.id === id) {
+            return { ...i, ...item };
+          }
+          return i;
+        });
+        setState((prev) => ({ ...prev, items: newItems }));
+      },
       setSelection: (selection) => setState((prev) => ({ ...prev, selection })),
     }),
     [fetchData, isLoadMore, state]

@@ -49,9 +49,8 @@ export const ReactListLoader = memo(({ children, position = "overlay" }) => {
   const scope = useMemo(
     () => ({
       isLoading,
-      styles,
     }),
-    [isLoading, styles]
+    [isLoading]
   );
 
   if (!initializingState && !isLoading) {
