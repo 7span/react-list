@@ -71,7 +71,10 @@ const ReactList = ({
           response: res,
           selection: [],
           // Append items for loadMore, replace for pagination
-          items: isLoadMore ? [...prev.items, ...res.items] : res.items,
+          items:
+            isLoadMore && currentState.page > 1
+              ? [...prev.items, ...res.items]
+              : res.items,
           count: res.count,
           initializingState: false,
           isLoading: false,
@@ -150,7 +153,15 @@ const ReactList = ({
         setState(newState);
         fetchData({}, newState);
       },
-
+      updateItemById: (item, id) => {
+        const newItems = state.items.map((i) => {
+          if (i.id === id) {
+            return { ...i, ...item };
+          }
+          return i;
+        });
+        setState((prev) => ({ ...prev, items: newItems }));
+      },
       setSelection: (selection) => setState((prev) => ({ ...prev, selection })),
     }),
     [fetchData, isLoadMore, state]
@@ -225,9 +236,7 @@ const ReactList = ({
     state.sortOrder,
   ]);
 
-  return typeof children === "function"
-    ? children({ ...memoizedState })
-    : children;
+  return typeof children === "function" ? children(memoizedState) : children;
 };
 
 export default ReactList;

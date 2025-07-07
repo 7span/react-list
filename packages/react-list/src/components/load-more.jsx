@@ -18,30 +18,13 @@ export const ReactListLoadMore = memo(({ children }) => {
     }
   }, [hasMoreItems, isLoading, setPage, page]);
 
-  const styles = useMemo(
-    () => ({
-      button: {
-        padding: "8px 16px",
-        backgroundColor: "#4B5563",
-        color: "#ffffff",
-        border: "none",
-        borderRadius: "4px",
-        cursor: "pointer",
-        opacity: isLoading || !hasMoreItems ? 0.5 : 1,
-        pointerEvents: isLoading || !hasMoreItems ? "none" : "auto",
-      },
-    }),
-    [isLoading, hasMoreItems]
-  );
-
   const scope = useMemo(
     () => ({
       isLoading,
       loadMore,
       hasMoreItems,
-      styles,
     }),
-    [isLoading, loadMore, hasMoreItems, styles]
+    [isLoading, loadMore, hasMoreItems]
   );
 
   if (!data || data.length === 0) {

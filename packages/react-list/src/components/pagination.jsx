@@ -17,55 +17,6 @@ export const ReactListPagination = memo(
     const { page, perPage } = pagination;
     const { initialLoading, isLoading } = loader;
 
-    const styles = useMemo(
-      () => ({
-        container: {
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-        },
-        button: {
-          padding: "4px 8px",
-          border: "1px solid #e5e7eb",
-          borderRadius: "4px",
-          cursor: "pointer",
-          backgroundColor: "#ffffff",
-          minWidth: "60px",
-          fontSize: "14px",
-        },
-        disabledButton: {
-          opacity: 0.5,
-          cursor: "not-allowed",
-        },
-        pagesContainer: {
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-        },
-        activePageSpan: {
-          padding: "4px 8px",
-          backgroundColor: "#2563eb",
-          color: "#ffffff",
-          borderRadius: "4px",
-          minWidth: "32px",
-          textAlign: "center",
-        },
-        pageButton: {
-          padding: "4px 8px",
-          border: "1px solid #e5e7eb",
-          borderRadius: "4px",
-          minWidth: "32px",
-          textAlign: "center",
-          cursor: "pointer",
-          backgroundColor: "#ffffff",
-          ":hover": {
-            backgroundColor: "#f3f4f6",
-          },
-        },
-      }),
-      []
-    );
-
     const paginationState = useMemo(() => {
       const pagesCount = Math.ceil(count / perPage);
       const halfWay = Math.floor(pageLinks / 2);
@@ -106,17 +57,8 @@ export const ReactListPagination = memo(
         ...paginationState,
         pagesToDisplay,
         ...navigation,
-        styles,
       }),
-      [
-        page,
-        perPage,
-        count,
-        paginationState,
-        pagesToDisplay,
-        navigation,
-        styles,
-      ]
+      [page, perPage, count, paginationState, pagesToDisplay, navigation]
     );
 
     if (initialLoading) return null;
@@ -134,7 +76,7 @@ export const ReactListPagination = memo(
     }
 
     return (
-      <div style={styles.container}>
+      <div className="react-list-pagination">
         {renderFirst ? (
           renderFirst(scope)
         ) : (
@@ -142,10 +84,6 @@ export const ReactListPagination = memo(
             type="button"
             disabled={!paginationState.hasPrev}
             onClick={navigation.first}
-            style={{
-              ...styles.button,
-              ...(!paginationState.hasPrev && styles.disabledButton),
-            }}
           >
             First
           </button>
@@ -158,10 +96,6 @@ export const ReactListPagination = memo(
             type="button"
             disabled={!paginationState.hasPrev}
             onClick={navigation.prev}
-            style={{
-              ...styles.button,
-              ...(!paginationState.hasPrev && styles.disabledButton),
-            }}
           >
             Prev
           </button>
@@ -170,7 +104,7 @@ export const ReactListPagination = memo(
         {renderPages ? (
           renderPages(scope)
         ) : (
-          <div style={styles.pagesContainer}>
+          <div>
             {pagesToDisplay.map((pageNum) => {
               const isActive = pageNum === page;
               const pageScope = { ...scope, page: pageNum, isActive };
@@ -180,12 +114,11 @@ export const ReactListPagination = memo(
               ) : (
                 <div key={`page-${pageNum}`}>
                   {isActive ? (
-                    <span style={styles.activePageSpan}>{pageNum}</span>
+                    <span>{pageNum}</span>
                   ) : (
                     <button
                       type="button"
                       onClick={() => navigation.setPage(pageNum)}
-                      style={styles.pageButton}
                     >
                       {pageNum}
                     </button>
@@ -203,10 +136,6 @@ export const ReactListPagination = memo(
             type="button"
             disabled={!paginationState.hasNext}
             onClick={navigation.next}
-            style={{
-              ...styles.button,
-              ...(!paginationState.hasNext && styles.disabledButton),
-            }}
           >
             Next
           </button>
@@ -219,10 +148,6 @@ export const ReactListPagination = memo(
             type="button"
             disabled={!paginationState.hasNext}
             onClick={navigation.last}
-            style={{
-              ...styles.button,
-              ...(!paginationState.hasNext && styles.disabledButton),
-            }}
           >
             Last
           </button>
