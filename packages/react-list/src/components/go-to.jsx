@@ -7,26 +7,6 @@ export const ReactListGoTo = memo(({ children }) => {
   const { page, perPage } = pagination;
   const { initialLoading, isLoading } = loader;
 
-  const styles = useMemo(
-    () => ({
-      container: {
-        display: "inline-block",
-        minWidth: "120px",
-      },
-      select: {
-        width: "100%",
-        padding: "8px 12px",
-        border: "1px solid #ccc",
-        borderRadius: "4px",
-        fontSize: "14px",
-        backgroundColor: "#fff",
-        cursor: "pointer",
-        outline: "none",
-      },
-    }),
-    []
-  );
-
   const { pages, pagesCount } = useMemo(() => {
     const pagesCount = Math.ceil(count / perPage);
     const pages = Array.from({ length: pagesCount }, (_, i) => i + 1);
@@ -46,9 +26,8 @@ export const ReactListGoTo = memo(({ children }) => {
       page,
       pages,
       pagesCount,
-      styles,
     }),
-    [setPage, page, pages, pagesCount, styles]
+    [setPage, page, pages, pagesCount]
   );
 
   if (initialLoading) return null;
@@ -61,19 +40,19 @@ export const ReactListGoTo = memo(({ children }) => {
     return null;
   }
 
-  if (children) {
-    return children(scope);
-  }
-
   return (
-    <div className="react-list-go-to" style={styles.container}>
-      <select value={page} onChange={handlePageChange} style={styles.select}>
-        {pages.map((pageNum) => (
-          <option key={`page-${pageNum}`} value={pageNum}>
-            Page {pageNum}
-          </option>
-        ))}
-      </select>
+    <div className="react-list-go-to">
+      {children ? (
+        children(scope)
+      ) : (
+        <select value={page} onChange={handlePageChange}>
+          {pages.map((pageNum) => (
+            <option key={`page-${pageNum}`} value={pageNum}>
+              Page {pageNum}
+            </option>
+          ))}
+        </select>
+      )}
     </div>
   );
 });

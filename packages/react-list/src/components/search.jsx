@@ -37,40 +37,23 @@ export const ReactListSearch = memo(({ children, debounceTime = 500 }) => {
     };
   }, []);
 
-  const searchStyles = {
-    container: {
-      margin: "10px 0",
-      width: "100%",
-      maxWidth: "300px",
-    },
-    input: {
-      width: "100%",
-      padding: "8px 12px",
-      border: "1px solid #ccc",
-      borderRadius: "4px",
-      fontSize: "14px",
-      outline: "none",
-    },
-  };
-
   const scope = {
     search: localSearch,
     setSearch: handleChange,
   };
 
-  if (children) {
-    return children(scope);
-  }
-
   return (
-    <div className="react-list-search" style={searchStyles.container}>
-      <input
-        type="text"
-        value={localSearch}
-        onChange={(e) => handleChange(e.target.value)}
-        placeholder="Search..."
-        style={searchStyles.input}
-      />
+    <div className="react-list-search">
+      {children ? (
+        children(scope)
+      ) : (
+        <input
+          type="text"
+          value={localSearch}
+          onChange={(e) => handleChange(e.target.value)}
+          placeholder="Search..."
+        />
+      )}
     </div>
   );
 });

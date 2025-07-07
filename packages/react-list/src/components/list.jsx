@@ -71,7 +71,10 @@ const ReactList = ({
           response: res,
           selection: [],
           // Append items for loadMore, replace for pagination
-          items: isLoadMore ? [...prev.items, ...res.items] : res.items,
+          items:
+            isLoadMore && currentState.page > 1
+              ? [...prev.items, ...res.items]
+              : res.items,
           count: res.count,
           initializingState: false,
           isLoading: false,
@@ -233,9 +236,7 @@ const ReactList = ({
     state.sortOrder,
   ]);
 
-  return typeof children === "function"
-    ? children({ ...memoizedState })
-    : children;
+  return typeof children === "function" ? children(memoizedState) : children;
 };
 
 export default ReactList;
