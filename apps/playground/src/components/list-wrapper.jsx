@@ -31,6 +31,21 @@ const ListWrapper = () => {
       <h2 className="list-title">React List Playground</h2>
       <ReactListProvider config={{ requestHandler }}>
         <ReactList
+          initialItems={[
+            {
+              id: "02989f79-99a8-4166-97e6-c3075a6a5d1d",
+              status: "draft",
+              sort: null,
+              user_created: "3642ef43-6cdd-4835-9998-b10b589cf21d",
+              date_created: "2023-07-18T13:52:04.000Z",
+              user_updated: "3642ef43-6cdd-4835-9998-b10b589cf21d",
+              date_updated: "2024-05-23T05:16:03.000Z",
+              name: "Nuxt.js",
+              color: "#2ECDA7",
+              logo: "9274138b-a315-4b48-83a7-c8643ea7f80b",
+            },
+          ]}
+          count={30}
           endpoint="skills"
           search={""}
           page={1}
