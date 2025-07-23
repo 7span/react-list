@@ -12,6 +12,7 @@ const ReactList = ({
   perPage = 25,
   sortBy = "",
   sortOrder = "desc",
+  count = 0,
   search = "",
   filters = {},
   attrs,
@@ -35,9 +36,9 @@ const ReactList = ({
     selection: [],
     error: null,
     response: null,
-    count: 0,
+    count,
     isLoading: false,
-    initializingState: true,
+    initializingState: !initialItems.length,
   });
 
   /**
@@ -218,7 +219,8 @@ const ReactList = ({
     if (!state.initializingState) {
       return;
     }
-    handlers.setPage(state.page);
+
+    if (!initialItems.length) handlers.setPage(state.page);
   }, []);
 
   // Update list state in context
