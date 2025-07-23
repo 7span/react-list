@@ -42,22 +42,22 @@ const ListWrapper = () => {
         >
           <div className="list-header">
             <div className="header-left">
-              <ReactListSearch />
-              {/* <ReactListSearch>
-              {({ search, setSearch }) => (
-                <div className="search-container">
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => {
-                      setSearch(e.target.value);
-                    }}
-                    placeholder="Search skills..."
-                    className="search-input"
-                  />
-                </div>
-              )}
-            </ReactListSearch> */}
+              {/* <ReactListSearch /> */}
+              <ReactListSearch>
+                {({ search, setSearch }) => (
+                  <div className="search-container">
+                    <input
+                      type="text"
+                      value={search}
+                      onChange={(e) => {
+                        setSearch(e.target.value);
+                      }}
+                      placeholder="Search skills..."
+                      className="search-input"
+                    />
+                  </div>
+                )}
+              </ReactListSearch>
             </div>
             <div className="header-right">
               <div className="filter-container">

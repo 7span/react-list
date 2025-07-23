@@ -5,11 +5,12 @@ import { useListContext } from "../context/list-provider";
  * ReactList component for handling data fetching, pagination, and state management
  */
 const ReactList = ({
+  initialItems = [],
   children,
   endpoint,
   page = 1,
   perPage = 25,
-  sortBy,
+  sortBy = "",
   sortOrder = "desc",
   search = "",
   filters = {},
@@ -30,7 +31,7 @@ const ReactList = ({
     search,
     filters,
     attrSettings: {},
-    items: [],
+    items: initialItems,
     selection: [],
     error: null,
     response: null,
