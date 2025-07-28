@@ -1,8 +1,9 @@
 import { memo, useMemo } from "react";
-import { useListContext } from "../context/list-provider";
+
+import { useReactListContext } from "../context/list-provider";
 
 export const ReactListLoader = memo(({ children, position = "overlay" }) => {
-  const { listState } = useListContext();
+  const { listState } = useReactListContext();
   const { loader } = listState;
   const { isLoading, initializingState } = loader;
 

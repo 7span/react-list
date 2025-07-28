@@ -1,8 +1,9 @@
 import { memo, useCallback, useMemo } from "react";
-import { useListContext } from "../context/list-provider";
+
+import { useReactListContext } from "../context/list-provider";
 
 export const ReactListAttributes = memo(({ children, renderAttribute }) => {
-  const { listState } = useListContext();
+  const { listState } = useReactListContext();
   const { attrs, attrSettings, updateAttr } = listState;
 
   const handleAttrChange = useCallback(

@@ -1,5 +1,6 @@
 import { memo, useMemo } from "react";
-import { useListContext } from "../context/list-provider";
+
+import { useReactListContext } from "../context/list-provider";
 
 export const ReactListPagination = memo(
   ({
@@ -12,7 +13,7 @@ export const ReactListPagination = memo(
     renderNext,
     renderLast,
   }) => {
-    const { listState } = useListContext();
+    const { listState } = useReactListContext();
     const { data, count, pagination, setPage, loader, error } = listState;
     const { page, perPage } = pagination;
     const { initialLoading, isLoading } = loader;

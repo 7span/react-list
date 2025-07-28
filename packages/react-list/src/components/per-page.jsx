@@ -1,9 +1,10 @@
 import { memo, useCallback, useMemo } from "react";
-import { useListContext } from "../context/list-provider";
+
+import { useReactListContext } from "../context/list-provider";
 
 export const ReactListPerPage = memo(
   ({ children, options = [10, 25, 50, 100] }) => {
-    const { listState } = useListContext();
+    const { listState } = useReactListContext();
     const { data, pagination, setPerPage, loader, error } = listState;
     const { perPage } = pagination;
     const { initialLoading } = loader;

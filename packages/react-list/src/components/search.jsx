@@ -1,8 +1,9 @@
 import { memo, useEffect, useRef, useState } from "react";
-import { useListContext } from "../context/list-provider";
+
+import { useReactListContext } from "../context/list-provider";
 
 export const ReactListSearch = memo(({ children, debounceTime = 500 }) => {
-  const { listState } = useListContext();
+  const { listState } = useReactListContext();
   const { search, setSearch } = listState;
   const [localSearch, setLocalSearch] = useState(search ?? "");
   const debounceTimerRef = useRef(null);

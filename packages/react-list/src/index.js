@@ -13,3 +13,4 @@ export { ReactListRefresh } from "./components/refresh";
 export { ReactListSearch } from "./components/search";
 export { ReactListSummary } from "./components/summary";
 export { ReactListProvider } from "./context/list-provider";
+export { useReactListContext } from "./context/list-provider";

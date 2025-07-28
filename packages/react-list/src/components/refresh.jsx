@@ -1,8 +1,9 @@
 import { memo, useCallback, useMemo } from "react";
-import { useListContext } from "../context/list-provider";
+
+import { useReactListContext } from "../context/list-provider";
 
 export const ReactListRefresh = memo(({ children }) => {
-  const { listState } = useListContext();
+  const { listState } = useReactListContext();
   const { loader, refresh } = listState;
   const { isLoading, initialLoading } = loader;
 

@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useListContext } from "../context/list-provider";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import { useReactListContext } from "../context/list-provider";
 
 /**
  * ReactList component for handling data fetching, pagination, and state management
@@ -9,6 +10,7 @@ const ReactList = ({
   children,
   endpoint,
   page = 1,
+  listId, // Required for external refresh capabilities
   perPage = 25,
   sortBy = "",
   sortOrder = "desc",
@@ -17,29 +19,157 @@ const ReactList = ({
   filters = {},
   attrs,
   version = 1,
+  requestHandler: customRequestHandler,
   paginationMode = "pagination",
   meta = {},
+  onItemSelect,
+  onResponse,
+  afterPageChange,
+  afterLoadMore,
 }) => {
-  const { requestHandler, setListState } = useListContext();
+  const {
+    requestHandler: globalRequestHandler,
+    setListState,
+    stateManager,
+  } = useReactListContext();
+  const requestHandler = customRequestHandler || globalRequestHandler;
+
+  const initRef = useRef(false);
+
   const isLoadMore = paginationMode === "loadMore";
 
-  // Initialize state with default values
-  const [state, setState] = useState({
+  const getContext = useCallback(
+    (currentState) => {
+      return {
+        endpoint,
+        version,
+        meta,
+        search: currentState?.search || search,
+        page: currentState?.page || page,
+        perPage: currentState?.perPage || perPage,
+        sortBy: currentState?.sortBy || sortBy,
+        sortOrder: currentState?.sortOrder || sortOrder,
+        filters: currentState?.filters || filters,
+        attrSettings: currentState?.attrSettings || {},
+        isRefresh: false,
+        listId, // Include listId in context for state manager
+      };
+    },
+    [
+      endpoint,
+      version,
+      meta,
+      search,
+      page,
+      perPage,
+      sortBy,
+      sortOrder,
+      filters,
+      listId,
+    ]
+  );
+
+  const getSavedState = useCallback(() => {
+    try {
+      const context = getContext();
+      const oldState = stateManager?.get?.(context);
+
+      return {
+        page: oldState?.page,
+        perPage: oldState?.perPage,
+        sortBy: oldState?.sortBy,
+        sortOrder: oldState?.sortOrder,
+        search: oldState?.search,
+        attrSettings: oldState?.attrSettings,
+        filters: oldState?.filters,
+      };
+    } catch (err) {
+      console.error(err);
+      return {};
+    }
+  }, [getContext, stateManager]);
+
+  const initializeState = useCallback(() => {
+    const savedState = getSavedState();
+
+    let initialPage = page;
+    if (isLoadMore) {
+      initialPage = 1;
+    } else if (savedState.page != null) {
+      initialPage = savedState.page;
+    }
+
+    return {
+      page: initialPage,
+      perPage: savedState.perPage != null ? savedState.perPage : perPage,
+      sortBy: savedState.sortBy != null ? savedState.sortBy : sortBy,
+      sortOrder:
+        savedState.sortOrder != null ? savedState.sortOrder : sortOrder,
+      search: savedState.search != null ? savedState.search : search,
+      filters: savedState.filters != null ? savedState.filters : filters,
+      attrSettings: savedState.attrSettings || {},
+      items: [],
+      selection: [],
+      error: null,
+      response: null,
+      count: 0,
+      isLoading: false,
+      initializingState: true,
+      confirmedPage: null,
+    };
+  }, [
+    getSavedState,
+    search,
     page,
     perPage,
     sortBy,
     sortOrder,
     search,
     filters,
-    attrSettings: {},
-    items: initialItems,
-    selection: [],
-    error: null,
-    response: null,
-    count,
-    isLoading: false,
-    initializingState: !initialItems.length,
-  });
+    isLoadMore,
+  ]);
+
+  const [state, setState] = useState(initializeState);
+
+  // Update state manager
+  const updateStateManager = useCallback(() => {
+    if (stateManager) {
+      const context = getContext(state);
+      stateManager?.set?.(context);
+    }
+  }, [stateManager, getContext, state]);
+
+  const setItems = useCallback(
+    (res) => {
+      if (onResponse) onResponse(res);
+
+      setState((prev) => {
+        let newItems;
+        if (isLoadMore) {
+          if (prev.page === 1) {
+            newItems = res.items;
+          } else {
+            newItems = [...prev.items, ...res.items];
+          }
+          if (afterLoadMore) afterLoadMore(res);
+        } else {
+          newItems = res.items;
+          if (afterPageChange) afterPageChange(res);
+        }
+
+        return {
+          ...prev,
+          items: newItems,
+          count: res.count,
+          response: res,
+          selection: [], // Reset selection on new data
+          confirmedPage: prev.page,
+          initializingState: false,
+        };
+      });
+    },
+    [onResponse, isLoadMore, afterLoadMore, afterPageChange]
+  );
 
   /**
    * Fetch data from the API
@@ -68,19 +198,8 @@ const ReactList = ({
           ...addContext,
         });
 
-        setState((prev) => ({
-          ...prev,
-          response: res,
-          selection: [],
-          // Append items for loadMore, replace for pagination
-          items:
-            isLoadMore && currentState.page > 1
-              ? [...prev.items, ...res.items]
-              : res.items,
-          count: res.count,
-          initializingState: false,
-          isLoading: false,
-        }));
+        updateStateManager();
+        setItems(res);
       } catch (err) {
         setState((prev) => ({
           ...prev,
@@ -91,6 +210,8 @@ const ReactList = ({
           isLoading: false,
         }));
         throw err;
+      } finally {
+        setState((prev) => ({ ...prev, isLoading: false }));
       }
     },
     [endpoint, version, isLoadMore, meta, requestHandler, state]
@@ -169,6 +290,20 @@ const ReactList = ({
     [fetchData, isLoadMore, state]
   );
 
+  const serializedAttrs = useMemo(() => {
+    const attrList = attrs || Object.keys(state.items[0] || {});
+    // You'll need to implement attrSerializer utility similar to Vue version
+    return attrList.map((attr) =>
+      typeof attr === "string" ? { name: attr } : attr
+    );
+  }, [attrs, state.items]);
+
+  const isEmpty = useMemo(() => state.items.length === 0, [state.items]);
+  const isInitialLoading = useMemo(
+    () => state.isLoading && state.initializingState,
+    [state.isLoading, state.initializingState]
+  );
+
   /**
    * Memoized state for context to prevent unnecessary re-renders
    */
@@ -179,6 +314,12 @@ const ReactList = ({
       error: state.error,
       count: state.count,
       selection: state.selection,
+
+      //Computed
+      serializedAttrs,
+      isEmpty,
+      context: getContext(state),
+
       pagination: {
         page: state.page,
         perPage: state.perPage,
@@ -188,6 +329,7 @@ const ReactList = ({
         isLoading: state.isLoading,
         initialLoading: state.initializingState,
       },
+      isInitialLoading,
       sort: { sortBy: state.sortBy, sortOrder: state.sortOrder },
       search: state.search,
       filters: state.filters,
@@ -217,10 +359,57 @@ const ReactList = ({
   // Initial data fetch
   useEffect(() => {
     if (!state.initializingState) {
-      return;
+      fetchData();
+    }
+  }, [
+    state.page,
+    state.perPage,
+    state.search,
+    state.sortBy,
+    state.sortOrder,
+    state.filters,
+  ]);
+
+  useEffect(() => {
+    if (onItemSelect) {
+      onItemSelect(state.selection);
+    }
+  }, [state.selection, onItemSelect]);
+
+  useEffect(() => {
+    if (!initRef.current) {
+      initRef.current = true;
+
+      // Register this list for external refresh if listId provided
+      if (listId && registerList) {
+        registerList(listId, handlers.refresh);
+      }
+
+      // Initialize state manager
+      if (stateManager?.init) {
+        const context = getContext(state);
+        stateManager.init(context);
+      }
+
+      // Initialize attrSettings if not provided
+      if (!state.attrSettings || Object.keys(state.attrSettings).length === 0) {
+        const initialAttrSettings = serializedAttrs.reduce((acc, attr) => {
+          acc[attr.name] = { visible: true };
+          return acc;
+        }, {});
+        setState((prev) => ({ ...prev, attrSettings: initialAttrSettings }));
+      }
+
+      // Start initial data fetch
+      handlers.setPage(state.page);
     }
 
-    if (!initialItems.length) handlers.setPage(state.page);
+    // Cleanup function
+    return () => {
+      if (listId && unregisterList) {
+        unregisterList(listId);
+      }
+    };
   }, []);
 
   // Update list state in context

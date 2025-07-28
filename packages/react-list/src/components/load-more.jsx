@@ -1,8 +1,9 @@
 import { memo, useCallback, useMemo } from "react";
-import { useListContext } from "../context/list-provider";
+
+import { useReactListContext } from "../context/list-provider";
 
 export const ReactListLoadMore = memo(({ children }) => {
-  const { listState } = useListContext();
+  const { listState } = useReactListContext();
   const { data, count, pagination, setPage, loader, error } = listState;
   const { page, perPage } = pagination;
   const { isLoading } = loader;
