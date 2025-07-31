@@ -10,8 +10,7 @@
     "preview": "vite preview",
     "prepublishOnly": "npm run build"
   },
-  "main1": "dist/react-list.js",
-  "main": "src/index.js",
+  "main": "dist/react-list.js",
   "files": [
     "dist"
   ],
