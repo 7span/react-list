@@ -5,6 +5,7 @@ export const ReactListItems = memo(({ children, renderItem }) => {
   const { listState } = useListContext();
   const { data: items = [], loader, error, setSort, sort } = listState;
   const { initialLoading } = loader;
+
   const scope = useMemo(
     () => ({
       items,
@@ -28,9 +29,7 @@ export const ReactListItems = memo(({ children, renderItem }) => {
     return (
       <div className="react-list-items">
         {items.map((item, index) => (
-          <div key={item.id || index} style={styles.itemWrapper}>
-            {renderItem({ item, index, styles })}
-          </div>
+          <div key={item.id || index}>{renderItem({ item, index })}</div>
         ))}
       </div>
     );

@@ -6,31 +6,6 @@ export const ReactListRefresh = memo(({ children }) => {
   const { loader, refresh } = listState;
   const { isLoading, initialLoading } = loader;
 
-  const styles = useMemo(
-    () => ({
-      container: {
-        display: "inline-block",
-      },
-      button: {
-        padding: "8px 16px",
-        border: "1px solid #e5e7eb",
-        borderRadius: "6px",
-        backgroundColor: "#ffffff",
-        cursor: "pointer",
-        fontSize: "14px",
-        transition: "all 0.2s ease",
-        ":hover": {
-          backgroundColor: "#f3f4f6",
-        },
-        ":disabled": {
-          opacity: 0.6,
-          cursor: "not-allowed",
-        },
-      },
-    }),
-    []
-  );
-
   const handleRefresh = useCallback(() => {
     refresh({ isRefresh: true });
   }, [refresh]);
@@ -40,7 +15,7 @@ export const ReactListRefresh = memo(({ children }) => {
       isLoading,
       refresh: handleRefresh,
     }),
-    [isLoading, handleRefresh, styles]
+    [isLoading, handleRefresh]
   );
 
   if (initialLoading) return null;
@@ -50,15 +25,8 @@ export const ReactListRefresh = memo(({ children }) => {
   }
 
   return (
-    <div className="react-list-refresh" style={styles.container}>
-      <button
-        onClick={handleRefresh}
-        disabled={isLoading}
-        style={{
-          ...styles.button,
-          ...(isLoading && styles.button[":disabled"]),
-        }}
-      >
+    <div className="react-list-refresh">
+      <button onClick={handleRefresh} disabled={isLoading}>
         {isLoading ? "Loading..." : "Refresh"}
       </button>
     </div>

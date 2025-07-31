@@ -6,27 +6,7 @@ export const ReactListPerPage = memo(
     const { listState } = useListContext();
     const { data, pagination, setPerPage, loader, error } = listState;
     const { perPage } = pagination;
-    const { initialLoading, isLoading } = loader;
-
-    const styles = useMemo(
-      () => ({
-        container: {
-          display: "inline-block",
-          minWidth: "150px",
-        },
-        select: {
-          width: "100%",
-          padding: "8px 12px",
-          border: "1px solid #e5e7eb",
-          borderRadius: "4px",
-          fontSize: "14px",
-          backgroundColor: "#ffffff",
-          cursor: "pointer",
-          outline: "none",
-        },
-      }),
-      []
-    );
+    const { initialLoading } = loader;
 
     const serializedOptions = useMemo(() => {
       return options.map((item) => {
@@ -52,9 +32,8 @@ export const ReactListPerPage = memo(
         perPage,
         setPerPage,
         options: serializedOptions,
-        styles,
       }),
-      [perPage, setPerPage, serializedOptions, styles]
+      [perPage, setPerPage, serializedOptions]
     );
 
     if (initialLoading) return null;
@@ -67,23 +46,19 @@ export const ReactListPerPage = memo(
       return null;
     }
 
-    if (children) {
-      return children(scope);
-    }
-
     return (
-      <div className="react-list-per-page" style={styles.container}>
-        <select
-          value={perPage}
-          onChange={handlePerPageChange}
-          style={styles.select}
-        >
-          {serializedOptions.map((option) => (
-            <option key={`option-${option.value}`} value={option.value}>
-              {option.label} items per page
-            </option>
-          ))}
-        </select>
+      <div className="react-list-per-page">
+        {children ? (
+          children(scope)
+        ) : (
+          <select value={perPage} onChange={handlePerPageChange}>
+            {serializedOptions.map((option) => (
+              <option key={`option-${option.value}`} value={option.value}>
+                {option.label} items per page
+              </option>
+            ))}
+          </select>
+        )}
       </div>
     );
   }

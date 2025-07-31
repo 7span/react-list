@@ -7,24 +7,6 @@ export const ReactListSummary = memo(({ children }) => {
   const { page, perPage } = pagination;
   const { initialLoading, isLoading } = loader;
 
-  const styles = useMemo(
-    () => ({
-      container: {
-        padding: "8px 0",
-        fontSize: "14px",
-        color: "#4B5563",
-      },
-      text: {
-        display: "inline-block",
-      },
-      highlight: {
-        fontWeight: "500",
-        color: "#111827",
-      },
-    }),
-    []
-  );
-
   const summaryData = useMemo(() => {
     const from = page * perPage - perPage + 1;
     const to = Math.min(page * perPage, count);
@@ -37,9 +19,8 @@ export const ReactListSummary = memo(({ children }) => {
     () => ({
       ...summaryData,
       count,
-      styles,
     }),
-    [summaryData, count, styles]
+    [summaryData, count]
   );
 
   if (initialLoading) return null;
@@ -52,20 +33,19 @@ export const ReactListSummary = memo(({ children }) => {
     return null;
   }
 
-  if (children) {
-    return children(scope);
-  }
-
   return (
-    <div className="react-list-summary" style={styles.container}>
-      <span style={styles.text}>
-        Showing <span style={styles.highlight}>{summaryData.visibleCount}</span>{" "}
-        items (
-        <span style={styles.highlight}>
-          {summaryData.from} - {summaryData.to}
+    <div className="react-list-summary">
+      {children ? (
+        children(scope)
+      ) : (
+        <span>
+          Showing <span>{summaryData.visibleCount}</span> items (
+          <span>
+            {summaryData.from} - {summaryData.to}
+          </span>
+          ) out of <span>{count}</span>
         </span>
-        ) out of <span style={styles.highlight}>{count}</span>
-      </span>
+      )}
     </div>
   );
 });

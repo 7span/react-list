@@ -6,12 +6,14 @@ import { hasActiveFilters } from "./utils";
  * ReactList component for handling data fetching, pagination, and state management
  */
 const ReactList = ({
+  initialItems = [],
   children,
   endpoint,
   page = 1,
   perPage = 25,
-  sortBy,
+  sortBy = "",
   sortOrder = "desc",
+  count = 0,
   search = "",
   filters = {},
   attrs,
@@ -86,13 +88,13 @@ const ReactList = ({
       search: savedState.search != null ? savedState.search : search,
       filters: savedState.filters != null ? savedState.filters : filters,
       attrSettings: savedState.attrSettings || {},
-      items: [],
+      items: initialItems,
       selection: [],
       error: null,
       response: null,
       count: 0,
       isLoading: false,
-      initializingState: true,
+      initializingState: !initialItems.length,
       confirmedPage: null,
     };
   }, [
@@ -168,9 +170,10 @@ const ReactList = ({
           response: res,
           selection: [],
           // Append items for loadMore, replace for pagination
-          items: isLoadMore
-            ? [...(currentState.items || []), ...res.items]
-            : res.items,
+          items:
+            isLoadMore && currentState.page > 1
+              ? [...prev.items, ...res.items]
+              : res.items,
           count: res.count,
           initializingState: false,
           isLoading: false,
@@ -259,7 +262,15 @@ const ReactList = ({
         setState(newState);
         fetchData({}, newState);
       },
-
+      updateItemById: (item, id) => {
+        const newItems = state.items.map((i) => {
+          if (i.id === id) {
+            return { ...i, ...item };
+          }
+          return i;
+        });
+        setState((prev) => ({ ...prev, items: newItems }));
+      },
       setSelection: (selection) => setState((prev) => ({ ...prev, selection })),
     }),
     [fetchData, isLoadMore, state]
@@ -311,19 +322,12 @@ const ReactList = ({
     ]
   );
 
-  // // Initial data fetch
-  // useEffect(() => {
-  //   if (!state.initializingState) {
-  //     return;
-  //   }
-  //   handlers.setPage(state.page);
-  // }, []);
-
   useEffect(() => {
+    if (!state.initializingState) {
+      return;
+    }
     if (!initRef.current) {
       initRef.current = true;
-
-      // Register this list for external refresh if listId provided
 
       // Initialize state manager
       if (stateManager?.init) {
@@ -331,7 +335,7 @@ const ReactList = ({
         stateManager.init(context);
       }
 
-      handlers.setPage(state.page);
+      if (!initialItems.length) handlers.setPage(state.page);
     }
   }, []);
 
@@ -351,9 +355,7 @@ const ReactList = ({
     state.sortOrder,
   ]);
 
-  return typeof children === "function"
-    ? children({ ...memoizedState })
-    : children;
+  return typeof children === "function" ? children(memoizedState) : children;
 };
 
 export default ReactList;

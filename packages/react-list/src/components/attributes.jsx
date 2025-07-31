@@ -5,27 +5,6 @@ export const ReactListAttributes = memo(({ children, renderAttribute }) => {
   const { listState } = useListContext();
   const { attrs, attrSettings, updateAttr } = listState;
 
-  const styles = {
-    container: {
-      display: "flex",
-      flexDirection: "column",
-      gap: "12px",
-      padding: "12px",
-    },
-    label: {
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      cursor: "pointer",
-      fontSize: "14px",
-    },
-    checkbox: {
-      width: "16px",
-      height: "16px",
-      cursor: "pointer",
-    },
-  };
-
   const handleAttrChange = useCallback(
     (attrName) => (e) => {
       updateAttr(attrName, "visible", e.target.checked);
@@ -38,7 +17,6 @@ export const ReactListAttributes = memo(({ children, renderAttribute }) => {
       attrs,
       attrSettings,
       updateAttr,
-      styles,
     }),
     [attrs, attrSettings, updateAttr]
   );
@@ -48,7 +26,7 @@ export const ReactListAttributes = memo(({ children, renderAttribute }) => {
   }
 
   return (
-    <div className="react-list-attributes" style={styles.container}>
+    <div className="react-list-attributes">
       {attrs.map((attr, index) => {
         if (renderAttribute) {
           return renderAttribute({
@@ -56,18 +34,16 @@ export const ReactListAttributes = memo(({ children, renderAttribute }) => {
             attr,
             updateAttr,
             attrSettings,
-            styles,
           });
         }
 
         return (
-          <label key={`attr-${index}`} style={styles.label}>
+          <label key={`attr-${index}`}>
             <span>{attr.label}</span>
             <input
               type="checkbox"
               checked={attrSettings?.[attr.name]?.visible ?? false}
               onChange={handleAttrChange(attr.name)}
-              style={styles.checkbox}
             />
           </label>
         );
