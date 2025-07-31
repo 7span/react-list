@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useListContext } from "../context/list-provider";
+import { hasActiveFilters } from "./utils";
 
 /**
  * ReactList component for handling data fetching, pagination, and state management
@@ -17,27 +18,107 @@ const ReactList = ({
   version = 1,
   paginationMode = "pagination",
   meta = {},
+  onResponse,
+  afterPageChange,
+  afterLoadMore,
 }) => {
-  const { requestHandler, setListState } = useListContext();
+  const { requestHandler, setListState, stateManager } = useListContext();
+
+  const initRef = useRef(false);
+
   const isLoadMore = paginationMode === "loadMore";
 
-  // Initialize state with default values
-  const [state, setState] = useState({
+  const getContext = useCallback(
+    (currentState) => {
+      return {
+        endpoint,
+        version,
+        meta,
+        search: currentState?.search || search,
+        page: currentState?.page || page,
+        perPage: currentState?.perPage || perPage,
+        sortBy: currentState?.sortBy || sortBy,
+        sortOrder: currentState?.sortOrder || sortOrder,
+        filters: currentState?.filters || filters,
+        attrSettings: currentState?.attrSettings || {},
+        isRefresh: false,
+      };
+    },
+    [endpoint, version, meta, search, page, perPage, sortBy, sortOrder, filters]
+  );
+
+  const getSavedState = useCallback(() => {
+    try {
+      const context = getContext();
+      const oldState = stateManager?.get?.(context);
+
+      return {
+        page: oldState?.page,
+        perPage: oldState?.perPage,
+        sortBy: oldState?.sortBy,
+        sortOrder: oldState?.sortOrder,
+        search: oldState?.search,
+        attrSettings: oldState?.attrSettings,
+        filters: oldState?.filters,
+      };
+    } catch (err) {
+      console.error(err);
+      return {};
+    }
+  }, [getContext, stateManager]);
+
+  const initializeState = useCallback(() => {
+    const savedState = getSavedState();
+
+    let initialPage = page;
+    if (isLoadMore) {
+      initialPage = 1;
+    } else if (savedState.page != null) {
+      initialPage = savedState.page;
+    }
+
+    return {
+      page: initialPage,
+      perPage: savedState.perPage != null ? savedState.perPage : perPage,
+      sortBy: savedState.sortBy != null ? savedState.sortBy : sortBy,
+      sortOrder:
+        savedState.sortOrder != null ? savedState.sortOrder : sortOrder,
+      search: savedState.search != null ? savedState.search : search,
+      filters: savedState.filters != null ? savedState.filters : filters,
+      attrSettings: savedState.attrSettings || {},
+      items: [],
+      selection: [],
+      error: null,
+      response: null,
+      count: 0,
+      isLoading: false,
+      initializingState: true,
+      confirmedPage: null,
+    };
+  }, [
+    getSavedState,
+    search,
     page,
     perPage,
     sortBy,
     sortOrder,
     search,
     filters,
-    attrSettings: {},
-    items: [],
-    selection: [],
-    error: null,
-    response: null,
-    count: 0,
-    isLoading: false,
-    initializingState: true,
-  });
+    isLoadMore,
+  ]);
+
+  // Initialize state with default values
+  const [state, setState] = useState(initializeState);
+
+  const updateStateManager = useCallback(
+    (stateToSave) => {
+      if (stateManager) {
+        const context = getContext(stateToSave);
+        stateManager?.set?.(context);
+      }
+    },
+    [stateManager, getContext]
+  );
 
   /**
    * Fetch data from the API
@@ -66,16 +147,38 @@ const ReactList = ({
           ...addContext,
         });
 
-        setState((prev) => ({
-          ...prev,
+        if (onResponse) onResponse(res);
+
+        let newItems;
+
+        if (isLoadMore) {
+          if (prev.page === 1) {
+            newItems = res.items;
+          } else {
+            newItems = [...prev.items, ...res.items];
+          }
+          if (afterLoadMore) afterLoadMore(res);
+        } else {
+          newItems = res.items;
+          if (afterPageChange) afterPageChange(res);
+        }
+
+        const updatedState = {
+          ...currentState,
           response: res,
           selection: [],
           // Append items for loadMore, replace for pagination
-          items: isLoadMore ? [...prev.items, ...res.items] : res.items,
+          items: isLoadMore
+            ? [...(currentState.items || []), ...res.items]
+            : res.items,
           count: res.count,
           initializingState: false,
           isLoading: false,
-        }));
+        };
+
+        updateStateManager(updatedState);
+
+        setState(updatedState);
       } catch (err) {
         setState((prev) => ({
           ...prev,
@@ -133,6 +236,12 @@ const ReactList = ({
         fetchData({}, newState);
       },
 
+      clearFilters: () => {
+        const newState = { ...state, filters: filters, page: 1 };
+        setState(newState);
+        fetchData({}, newState);
+      },
+
       refresh: (addContext = { isRefresh: true }) => {
         if (isLoadMore) {
           // For loadMore, reset to page 1
@@ -176,6 +285,7 @@ const ReactList = ({
         initialLoading: state.initializingState,
       },
       sort: { sortBy: state.sortBy, sortOrder: state.sortOrder },
+      hasActiveFilters: hasActiveFilters(state.filters, filters),
       search: state.search,
       filters: state.filters,
       attrs: attrs || Object.keys(state.items[0] || {}),
@@ -201,12 +311,28 @@ const ReactList = ({
     ]
   );
 
-  // Initial data fetch
+  // // Initial data fetch
+  // useEffect(() => {
+  //   if (!state.initializingState) {
+  //     return;
+  //   }
+  //   handlers.setPage(state.page);
+  // }, []);
+
   useEffect(() => {
-    if (!state.initializingState) {
-      return;
+    if (!initRef.current) {
+      initRef.current = true;
+
+      // Register this list for external refresh if listId provided
+
+      // Initialize state manager
+      if (stateManager?.init) {
+        const context = getContext(state);
+        stateManager.init(context);
+      }
+
+      handlers.setPage(state.page);
     }
-    handlers.setPage(state.page);
   }, []);
 
   // Update list state in context

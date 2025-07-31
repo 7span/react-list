@@ -25,7 +25,7 @@ const ListWrapper = () => {
   const [filters, setFilters] = useState({});
 
   return (
-    <div className="list-container">
+    <div className="list-container" style={{ color: "black" }}>
       <h2 className="list-title">React List Playground</h2>
       <ReactList
         endpoint="skills"
@@ -271,7 +271,7 @@ const ListWrapper = () => {
                             {items.map((item) => (
                               <tr key={item.id}>
                                 <td>{item.id}</td>
-                                <td>{item.name}</td>
+                                <td style={{ color: "black" }}>{item.name}</td>
                                 <td>{item.status}</td>
                                 <td>
                                   {new Date(item.date_updated).toLocaleString()}
@@ -344,6 +344,7 @@ const ListWrapper = () => {
                                 setPage(page);
                               }}
                               className="page-input"
+                              style={{ color: "black" }}
                             />
                             <span className="control-label">
                               of {pagesCount}
