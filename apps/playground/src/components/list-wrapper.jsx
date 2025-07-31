@@ -14,7 +14,9 @@ import ReactList, {
 
 import { Icon } from "@iconify/react";
 import { useState } from "react";
-import requestHandler from "../api/request-handler";
+
+import readtListOptions from "./react-list";
+
 import "../app.css";
 
 const ListWrapper = () => {
@@ -27,9 +29,9 @@ const ListWrapper = () => {
   const [filters, setFilters] = useState({});
 
   return (
-    <div className="list-container">
+    <div className="list-container" style={{ color: "black" }}>
       <h2 className="list-title">React List Playground</h2>
-      <ReactListProvider config={{ requestHandler }}>
+      <ReactListProvider config={readtListOptions}>
         <ReactList
           initialItems={[
             {
