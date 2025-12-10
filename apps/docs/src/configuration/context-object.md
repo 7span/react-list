@@ -18,7 +18,7 @@ It contains everything ReactList knows about the current list view, bundled into
   filters: Object,
   search: String,
   meta: Object,
-  isRefresh:Boolean
+  isRefresh: Boolean
 }
 ```
 
