@@ -52,6 +52,30 @@ const members = [
       { icon: 'x', link: 'https://x.com/theharshin' }
     ]
   },
+  {
+    avatar: 'https://github.com/maulik-7span.png',
+    name: 'Maulik Savaliya',
+    title: 'Contributor',
+    links: [
+      { icon: 'github', link: 'https://github.com/maulik-7span' },
+    ]
+  },
+  {
+    avatar: 'https://github.com/sanjay-t-7span.png',
+    name: 'Sanjay Tomar',
+    title: 'Contributor',
+    links: [
+      { icon: 'github', link: 'https://github.com/sanjay-t-7span' }
+    ]
+  },
+  {
+    avatar: 'https://github.com/darshak-7span.png',
+    name: 'Darshak Ribadiya',
+    title: 'Contributor',
+    links: [
+      { icon: 'github', link: 'https://github.com/darshak-7span' }
+    ]
+  },
 ]
 </script>
 
