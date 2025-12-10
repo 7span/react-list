@@ -1,26 +1,59 @@
 # Options
 
-When installing ReactList, you can pass an options object to customise its behaviour. These options allow you to define global behaviour like how API requests are handled or how state is persisted.
+When setting up ReactList, you pass a configuration object to `<ReactListProvider>`. These options allow you to define global behavior like how API requests are handled or how state is persisted.
 
-### `componentPrefix`
+## Configuration Object
 
-- Type: `string`
-- Default: `''`
+The configuration object passed to `<ReactListProvider>` should have the following structure:
 
-Adds a prefix to the globally registered components. Useful to avoid naming conflicts or to follow a naming convention in your app.
+```jsx
+{
+  requestHandler: Function,  // Required
+  stateManager: Object       // Optional
+}
+```
 
 ### `requestHandler`
 
 - Type: `Function`
+- **Required**
 
-Global request handler function used to fetch data. Receives an object with `endpoint`, `page`, `perPage`, `filters`, and more. Must return a Promise.
+Global request handler function used to fetch data. Receives a context object with `endpoint`, `page`, `perPage`, `filters`, and more. Must return a Promise that resolves with `{ items, count, meta? }`.
 
-Read more about [Request Handler](/configuration/request-handler.md).
+Read more about [Request Handler](/configuration/request-handler).
 
 ### `stateManager`
 
-- Type: `Function`
+- Type: `Object`
+- Default: `{}`
+- Optional
 
-The stateManager option allows you to customize how the listing state is saved and retrieved — for example, from localStorage, session, or even an API.
+The stateManager option allows you to customize how the listing state is saved and retrieved — for example, from localStorage, sessionStorage, or even an API.
 
-Read more about [State Manager](/configuration/state-manager.md).
+The stateManager object should have the following methods:
+- `init(context)` - Called when the list initializes
+- `get(context)` - Called to retrieve saved state
+- `set(context)` - Called to persist state
+
+Read more about [State Manager](/configuration/state-manager).
+
+## Example
+
+```jsx
+import { ReactListProvider } from '@7span/react-list';
+import requestHandler from './request-handler';
+import stateManager from './state-manager';
+
+function App() {
+  const config = {
+    requestHandler,
+    stateManager, // Optional
+  };
+
+  return (
+    <ReactListProvider config={config}>
+      {/* Your app */}
+    </ReactListProvider>
+  );
+}
+```
