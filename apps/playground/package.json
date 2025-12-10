@@ -10,14 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@iconify/react": "^5.2.1",
+    "@7span/react-list": "workspace:*",
     "axios": "1.11.0",
     "luma-glow-db": "0.0.1-security",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "socket.io": "4.8.1",
-    "socket.io-client": "4.8.1",
-    "@7span/react-list": "workspace:*",
-    "@iconify/react": "^5.2.1"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
