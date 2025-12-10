@@ -1,6 +1,6 @@
 # `<ReactListPagination>`
 
-The default slot gives you full control over rendering pagination. You get all the computed state and helper functions needed to build a custom pagination layout from scratch.
+This component gives you full control over rendering pagination. You get all the computed state and helper functions needed to build a custom pagination layout from scratch.
 
 ```jsx
 <ReactListPagination pageLinks={5}>
@@ -15,7 +15,7 @@ The default slot gives you full control over rendering pagination. You get all t
 ```
 
 ::: warning Heads up!
-This component will only work when `paginationMode` prop is set to `pagination` on the root `<ReactList>` component.
+This component will only work when the `paginationMode` prop is set to `pagination` on the root `<ReactList>` component.
 :::
 
 ## Props
@@ -69,25 +69,17 @@ Use this to render the entire pagination manually. The children callback exposes
 
 Button for navigating to the first page.
 
-Exposes the same children callback props as [children](#pagination_children_callback_props)
-
 ### `prev`
 
 Button for navigating to the previous page.
-
-Exposes the same children callback props as [children](#pagination_children_callback_props)
 
 ### `pages`
 
 Render visible page numbers.
 
-Exposes the same children callback props as [children](#pagination_children_callback_props)
-
 ### `page`
 
 Button for each visible page number.
-
-Exposes the same children callback props as [children](#pagination_children_callback_props)
 
 Additionally, following helper children callback props are available:
 
@@ -102,10 +94,6 @@ Additionally, following helper children callback props are available:
 
 Button for navigating to the next page.
 
-Exposes the same children callback props as [children](#pagination_children_callback_props)
-
 ### `last`
 
 Button for navigating to the last page.
-
-Exposes the same children callback props as [children](#pagination_children_callback_props)

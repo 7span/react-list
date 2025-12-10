@@ -15,23 +15,17 @@ import ReactList, {
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 
-import readtListOptions from "./react-list";
+import reactListOptions from "./react-list";
 
 import "../app.css";
 
 const ListWrapper = () => {
-  const [sortState, setSortState] = useState({
-    sortBy: "",
-    sortOrder: "",
-  });
-
-  const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({});
 
   return (
     <div className="list-container" style={{ color: "black" }}>
       <h2 className="list-title">React List Playground</h2>
-      <ReactListProvider config={readtListOptions}>
+      <ReactListProvider config={reactListOptions}>
         <ReactList
           initialItems={[
             {
@@ -52,9 +46,7 @@ const ListWrapper = () => {
           search={""}
           page={1}
           perPage={10}
-          filters={{}}
-          sortBy={sortState.sortBy}
-          sortOrder={sortState.sortOrder}
+          filters={filters}
           paginationMode="pagination"
         >
           <div className="list-header">

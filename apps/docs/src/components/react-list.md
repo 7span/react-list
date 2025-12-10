@@ -6,9 +6,15 @@ It’s the only component you must include. Every other component depends on the
 
 ```js
 <ReactList>
-  <ReactListItems items={items}>
+  <ReactListItems>
     {/* Render your list items here */}
-    <pre>{items}</pre>
+    {({ items }) => (
+      <div>
+        {items.map((item) => (
+          <pre key={item.id}>{item}</pre>
+        ))}
+      </div>
+    )}
   </ReactListItems>
 </ReactList>
 ```
@@ -37,13 +43,13 @@ It’s the only component you must include. Every other component depends on the
 | afterPageChange |           | WIP         |
 | afterLoadMore   |           | WIP         |
 
-## Slots
+## children
 
-### `default`
+### `children as function`
 
-The only slot available in `<ReactList>` is `default`. It exposes a set of scoped variables that let you access and render the list state however you like.
+You can use `children` as function to render the list items based on your needs. It exposes a set of scoped variables that let you access and render the list state however you like.
 
-#### Slot Props
+#### children as function callback Props
 
 | Key       | Description                                                                                     |
 | --------- | ----------------------------------------------------------------------------------------------- |

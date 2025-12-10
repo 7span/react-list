@@ -136,6 +136,7 @@ const ReactList = ({
 
       try {
         const currentState = newState || state;
+        const previousItems = newState?.items ?? state.items;
         const res = await requestHandler({
           endpoint,
           version,
@@ -154,11 +155,10 @@ const ReactList = ({
         let newItems;
 
         if (isLoadMore) {
-          if (prev.page === 1) {
-            newItems = res.items;
-          } else {
-            newItems = [...prev.items, ...res.items];
-          }
+          newItems =
+            currentState.page === 1
+              ? res.items
+              : [...previousItems, ...res.items];
           if (afterLoadMore) afterLoadMore(res);
         } else {
           newItems = res.items;
@@ -172,7 +172,7 @@ const ReactList = ({
           // Append items for loadMore, replace for pagination
           items:
             isLoadMore && currentState.page > 1
-              ? [...prev.items, ...res.items]
+              ? [...previousItems, ...res.items]
               : res.items,
           count: res.count,
           initializingState: false,

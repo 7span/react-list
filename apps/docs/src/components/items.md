@@ -4,9 +4,9 @@ This is a wrapper component to render the list of items returned by `<ReactList>
 
 ## children
 
-You can use `children` callback based on your needs.
+You can use `children` as a function to render the list items based on your needs.
 
-### `children`
+### `children as function`
 
 This exposes the entire items array. You handle the looping yourself.
 
@@ -29,7 +29,7 @@ This exposes the entire items array. You handle the looping yourself.
 </ReactList>
 ```
 
-#### children callback Props
+#### children as function Props
 
 | Name    | Description                                                                                 |
 | ------- | ------------------------------------------------------------------------------------------- |
