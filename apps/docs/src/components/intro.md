@@ -14,9 +14,14 @@ Instead, it gives you a set of composable components that expose useful state an
     <ReactListInitialLoader />
     <ReactListLoader />
     <ReactListError />
-    <ReactListItems items={items}>
-      {/* Render your list items here */}
-      <pre>{items}</pre>
+    <ReactListItems>
+      {({ items }) => (
+        <div>
+          {items.map((item) => (
+            <pre key={item.id}>{item}</pre>
+          ))}
+        </div>
+      )}
     </ReactListItems>
     <ReactListPagination />
     <ReactListLoadMore />
