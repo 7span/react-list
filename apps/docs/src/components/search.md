@@ -8,10 +8,10 @@ The component maintains a local search state that is synchronized with the list'
 
 ## Props
 
-| Name           | Type                | Description                                                                                                                                    |
-| -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `debounceTime` | `Number`            | Time in milliseconds to debounce the search input. Default: `500`                                                                              |
-| `children`     | `Function | ReactNode` | Optional. Custom content to display. Can be a function that receives the scope object, or a React element (defaults to an input field) |
+| Name           | Type       | Description                                                                                                                            |
+| -------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `debounceTime` | `Number`   | Time in milliseconds to debounce the search input. Default: `500`                                                                      |
+| `children`     | `Function` | Optional. Custom content to display. Can be a function that receives the scope object, or a React element (defaults to an input field) |
 
 ## Usage
 
@@ -31,7 +31,7 @@ Use `children` as a function to access the search state and setter:
       />
     )}
   </ReactListSearch>
-  
+
   <ReactListItems>
     {({ items }) => (
       <div>
@@ -58,9 +58,9 @@ You can also pass React elements as children, though using a function is recomme
 
 ### children callback Props
 
-| Name        | Type       | Description                                                                                    |
-| ----------- | ---------- | ---------------------------------------------------------------------------------------------- |
-| `search`    | `String`   | Current search query string (local state - updates immediately as you type)                   |
+| Name        | Type       | Description                                                                                                                                                           |
+| ----------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `search`    | `String`   | Current search query string (local state - updates immediately as you type)                                                                                           |
 | `setSearch` | `Function` | Function to update the search string. The value is debounced before updating the list state. Pass the search value as the first argument (e.g., `setSearch('query')`) |
 
 ## Important Notes
@@ -73,6 +73,7 @@ You can also pass React elements as children, though using a function is recomme
 ### Debouncing
 
 The debounce mechanism works as follows:
+
 1. User types in the input
 2. Local `search` state updates immediately (UI stays responsive)
 3. After `debounceTime` milliseconds of no typing, the debounced value is sent to the list
@@ -105,14 +106,14 @@ If no `children` are provided, the component will render a default input field:
           className="search-input"
         />
         {search && (
-          <button onClick={() => setSearch('')}>
+          <button onClick={() => setSearch("")}>
             <Icon name="clear" />
           </button>
         )}
       </div>
     )}
   </ReactListSearch>
-  
+
   <ReactListItems>
     {({ items }) => (
       <div>
@@ -147,12 +148,12 @@ A longer debounce time (e.g., 1000ms) means the API call will wait longer after 
 If you need to access the actual list search state (not the local debounced state), you can use the list context directly:
 
 ```jsx
-import { useListContext } from '@7span/react-list';
+import { useListContext } from "@7span/react-list";
 
 function CustomSearch() {
   const { listState } = useListContext();
   const { search: listSearch, setSearch } = listState;
-  
+
   // listSearch is the actual search value used by the list
   // This updates only after debouncing
 }

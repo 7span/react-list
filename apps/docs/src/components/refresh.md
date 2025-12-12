@@ -10,9 +10,9 @@ The component will return `null` (render nothing) during initial loading (`initi
 
 ## Props
 
-| Name      | Type                | Description                                                                     |
-| --------- | ------------------- | ------------------------------------------------------------------------------- |
-| `children` | `Function | ReactNode` | Optional. Custom content to display. Can be a function that receives the scope object, or a React element |
+| Name       | Type       | Description                                                                                               |
+| ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| `children` | `Function` | Optional. Custom content to display. Can be a function that receives the scope object, or a React element |
 
 ## Usage
 
@@ -31,11 +31,11 @@ Use `children` as a function to access the refresh function and loading state:
       </div>
     )}
   </ReactListItems>
-  
+
   <ReactListRefresh>
     {({ isLoading, refresh }) => (
       <button onClick={refresh} disabled={isLoading}>
-        {isLoading ? 'Refreshing...' : 'Refresh'}
+        {isLoading ? "Refreshing..." : "Refresh"}
       </button>
     )}
   </ReactListRefresh>
@@ -54,9 +54,9 @@ You can also pass React elements as children, though using a function is recomme
 
 ### children callback Props (when used as function)
 
-| Name        | Type       | Description                                                                                    |
-| ----------- | ---------- | ---------------------------------------------------------------------------------------------- |
-| `isLoading` | `Boolean`  | `true` while the refresh request is in progress, `false` otherwise                           |
+| Name        | Type       | Description                                                                                        |
+| ----------- | ---------- | -------------------------------------------------------------------------------------------------- |
+| `isLoading` | `Boolean`  | `true` while the refresh request is in progress, `false` otherwise                                 |
 | `refresh`   | `Function` | Function to trigger a refresh. Calls the list's refresh handler with `{ isRefresh: true }` context |
 
 ## Refresh Behavior
@@ -67,6 +67,7 @@ When `refresh()` is called:
 2. For **loadMore mode**: The page is reset to 1, items are cleared, and fresh data is loaded
 
 The refresh function passes `{ isRefresh: true }` as additional context to the request handler, which can be useful for:
+
 - Bypassing cache
 - Adding refresh-specific headers
 - Logging refresh events
@@ -97,19 +98,12 @@ If no `children` are provided, the component will render a default refresh butto
       </div>
     )}
   </ReactListItems>
-  
+
   <ReactListRefresh>
     {({ isLoading, refresh }) => (
-      <button 
-        onClick={refresh} 
-        disabled={isLoading}
-        className="refresh-button"
-      >
-        <Icon 
-          name="refresh" 
-          className={isLoading ? 'spinning' : ''} 
-        />
-        <span>{isLoading ? 'Refreshing...' : 'Refresh'}</span>
+      <button onClick={refresh} disabled={isLoading} className="refresh-button">
+        <Icon name="refresh" className={isLoading ? "spinning" : ""} />
+        <span>{isLoading ? "Refreshing..." : "Refresh"}</span>
       </button>
     )}
   </ReactListRefresh>
@@ -123,10 +117,10 @@ If no `children` are provided, the component will render a default refresh butto
   {({ isLoading, refresh }) => (
     <div className="refresh-container">
       {isLoading && <Spinner size="small" />}
-      <button 
-        onClick={refresh} 
+      <button
+        onClick={refresh}
         disabled={isLoading}
-        className={isLoading ? 'loading' : ''}
+        className={isLoading ? "loading" : ""}
       >
         Refresh Data
       </button>
@@ -142,11 +136,7 @@ If no `children` are provided, the component will render a default refresh butto
   <h2>Users</h2>
   <ReactListRefresh>
     {({ isLoading, refresh }) => (
-      <button 
-        onClick={refresh} 
-        disabled={isLoading}
-        title="Refresh list"
-      >
+      <button onClick={refresh} disabled={isLoading} title="Refresh list">
         <Icon name="refresh" />
       </button>
     )}
@@ -161,15 +151,13 @@ You can use the `isRefresh` flag in your request handler to implement custom ref
 ```jsx
 const requestHandler = async ({ endpoint, isRefresh, ...params }) => {
   // Add cache-busting headers when refreshing
-  const headers = isRefresh 
-    ? { 'Cache-Control': 'no-cache' }
-    : {};
-  
+  const headers = isRefresh ? { "Cache-Control": "no-cache" } : {};
+
   const response = await fetch(`/api/${endpoint}`, {
     headers,
     // ... other params
   });
-  
+
   return response.json();
 };
 ```
