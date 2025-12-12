@@ -59,7 +59,7 @@ export default defineConfig({
           { text: "ReactListEmpty", link: "/components/empty" },
           { text: "ReactListError", link: "/components/error" },
           { text: "ReactListRefresh", link: "/components/refresh" },
-          { text: "ReactListAttributes", link: "/components/attributes" },
+          // { text: "ReactListAttributes", link: "/components/attributes" },
         ],
       },
     ],
