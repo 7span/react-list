@@ -4,15 +4,16 @@ import { useListContext } from "../context/list-provider";
 export const ReactListItems = memo(({ children, renderItem }) => {
   const { listState } = useListContext();
   const { data: items = [], loader, error, setSort, sort } = listState;
-  const { initialLoading } = loader;
+  const { initialLoading, isLoading } = loader;
 
   const scope = useMemo(
     () => ({
       items,
+      isLoading,
       setSort,
       sort,
     }),
-    [items, sort, setSort]
+    [items, sort, setSort, isLoading]
   );
 
   if (initialLoading) return null;
