@@ -1,6 +1,6 @@
 {
   "name": "@7span/react-list",
-  "version": "0.0.6",
+  "version": "1.0.0",
   "description": "A simple and reusable list component for React",
   "type": "module",
   "scripts": {
