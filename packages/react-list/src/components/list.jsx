@@ -339,6 +339,21 @@ const ReactList = ({
     }
   }, []);
 
+  // Watch for changes in filters prop and update internal state
+  const stringifiedFilters = JSON.stringify(filters);
+  useEffect(() => {
+    // Skip on initial mount (handled by initializeState)
+    if (!initRef.current) return;
+
+    // Only update if filters prop actually changed from internal state
+    const currentFilters = JSON.stringify(state.filters);
+    if (stringifiedFilters !== currentFilters) {
+      const newState = { ...state, filters, page: 1 };
+      setState(newState);
+      fetchData({}, newState);
+    }
+  }, [stringifiedFilters]);
+
   // Update list state in context
   useEffect(() => {
     setListState(memoizedState);
