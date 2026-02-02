@@ -4,7 +4,7 @@ export { ReactListError } from "./components/error";
 export { ReactListGoTo } from "./components/go-to";
 export { ReactListInitialLoader } from "./components/initial-loader";
 export { ReactListItems } from "./components/items";
-export { default as ReactList } from "./components/list";
+export { default } from "./components/list";
 export { ReactListLoadMore } from "./components/load-more";
 export { ReactListLoader } from "./components/loader";
 export { ReactListPagination } from "./components/pagination";
