@@ -1,25 +1,25 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
-      external: ["react", "react/jsx-runtime"],
+      external: ["react", "react-dom", "react/jsx-runtime"],
       output: {
         globals: {
-          react: "react",
+          react: "React",
+          "react-dom": "ReactDOM",
           "react/jsx-runtime": "jsxRuntime",
         },
-        exports: "named",
       },
     },
     lib: {
-      entry: [`src/index.js`],
+      entry: "src/index.js",
       name: "ReactList",
       fileName: "react-list",
+      formats: ["es", "cjs"],
     },
   },
 });
