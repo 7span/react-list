@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useListContext } from "../context/list-provider";
 import { hasActiveFilters } from "./utils";
+import { isEqual } from "../utils";
 
 /**
  * ReactList component for handling data fetching, pagination, and state management
@@ -338,6 +339,19 @@ const ReactList = ({
       if (!initialItems.length) handlers.setPage(state.page);
     }
   }, []);
+
+  // Watch for changes in filters prop and update internal state
+  useEffect(() => {
+    // Skip on initial mount (handled by initializeState)
+    if (!initRef.current) return;
+
+    // Only update if filters prop actually changed from internal state
+    if (!isEqual(filters, state.filters)) {
+      const newState = { ...state, filters, page: 1 };
+      setState(newState);
+      fetchData({}, newState);
+    }
+  }, [filters]);
 
   // Update list state in context
   useEffect(() => {
