@@ -1,7 +1,21 @@
 import { memo, useCallback, useMemo } from "react";
+import type { ReactNode } from "react";
 import { useListContext } from "../context/list-provider";
 
-export const ReactListGoTo = memo(({ children }) => {
+type ReactListGoToScope = {
+  setPage: (page: number, addContext?: Record<string, unknown>) => void;
+  page: number;
+  pages: number[];
+  pagesCount: number;
+};
+
+type ReactListGoToProps = {
+  children?:
+    | ReactNode
+    | ((scope: ReactListGoToScope) => ReactNode);
+};
+
+export const ReactListGoTo = memo(({ children }: ReactListGoToProps) => {
   const { listState } = useListContext();
   const { data, count, pagination, setPage, loader, error } = listState;
   const { page, perPage } = pagination;
@@ -42,8 +56,10 @@ export const ReactListGoTo = memo(({ children }) => {
 
   return (
     <div className="react-list-go-to">
-      {children ? (
+      {typeof children === "function" ? (
         children(scope)
+      ) : children ? (
+        children
       ) : (
         <select value={page} onChange={handlePageChange}>
           {pages.map((pageNum) => (
