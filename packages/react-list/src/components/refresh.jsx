@@ -1,18 +1,7 @@
 import { memo, useCallback, useMemo } from "react";
 import { useListContext } from "../context/list-provider";
 
-import type { ReactNode } from "react";
-
-type ReactListRefreshScope = {
-  isLoading: boolean;
-  refresh: () => void;
-};
-
-type ReactListRefreshProps = {
-  children?: ReactNode | ((scope: ReactListRefreshScope) => ReactNode);
-};
-
-export const ReactListRefresh = memo(({ children }: ReactListRefreshProps) => {
+export const ReactListRefresh = memo(({ children }) => {
   const { listState } = useListContext();
   const { loader, refresh } = listState;
   const { isLoading, initialLoading } = loader;
@@ -31,8 +20,9 @@ export const ReactListRefresh = memo(({ children }: ReactListRefreshProps) => {
 
   if (initialLoading) return null;
 
-  if (typeof children === "function") return children(scope);
-  if (children) return children;
+  if (children) {
+    return children(scope);
+  }
 
   return (
     <div className="react-list-refresh">

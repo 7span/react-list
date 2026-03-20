@@ -1,29 +1,7 @@
 import { memo, useMemo } from "react";
 import { useListContext } from "../context/list-provider";
 
-import type { ReactNode } from "react";
-
-import type {
-  ReactListItem,
-  ReactListSort,
-  ReactListSortOrder,
-} from "../types";
-
-type ReactListItemsScope = {
-  items: ReactListItem[];
-  isLoading: boolean;
-  setSort: (args: { by: string; order: ReactListSortOrder }) => void;
-  sort: ReactListSort;
-};
-
-type ReactListItemsProps = {
-  children?:
-    | ReactNode
-    | ((scope: ReactListItemsScope) => ReactNode);
-  renderItem?: (args: { item: ReactListItem; index: number }) => ReactNode;
-};
-
-export const ReactListItems = memo(({ children, renderItem }: ReactListItemsProps) => {
+export const ReactListItems = memo(({ children, renderItem }) => {
   const { listState } = useListContext();
   const { data: items = [], loader, error, setSort, sort } = listState;
   const { initialLoading, isLoading } = loader;

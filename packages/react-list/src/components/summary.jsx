@@ -1,21 +1,7 @@
 import { memo, useMemo } from "react";
 import { useListContext } from "../context/list-provider";
 
-import type { ReactNode } from "react";
-
-type ReactListSummaryScope = {
-  from: number;
-  to: number;
-  visibleCount: number;
-  count: number;
-};
-
-type ReactListSummaryProps = {
-  children?: ReactNode | ((scope: ReactListSummaryScope) => ReactNode);
-};
-
-export const ReactListSummary = memo(
-  ({ children }: ReactListSummaryProps) => {
+export const ReactListSummary = memo(({ children }) => {
   const { listState } = useListContext();
   const { data, count, pagination, loader, error } = listState;
   const { page, perPage } = pagination;
@@ -49,10 +35,8 @@ export const ReactListSummary = memo(
 
   return (
     <div className="react-list-summary">
-      {typeof children === "function" ? (
+      {children ? (
         children(scope)
-      ) : children ? (
-        children
       ) : (
         <span>
           Showing <span>{summaryData.visibleCount}</span> items (
@@ -64,5 +48,4 @@ export const ReactListSummary = memo(
       )}
     </div>
   );
-  }
-);
+});

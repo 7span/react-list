@@ -1,42 +1,6 @@
 import { memo, useMemo } from "react";
 import { useListContext } from "../context/list-provider";
 
-import type { ReactNode } from "react";
-
-type ReactListPaginationNavigation = {
-  prev: () => void;
-  next: () => void;
-  first: () => void;
-  last: () => void;
-  setPage: (newPage: number) => void;
-};
-
-type ReactListPaginationScope = ReactListPaginationNavigation & {
-  page: number;
-  perPage: number;
-  count: number;
-  pagesCount: number;
-  halfWay: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-  pagesToDisplay: number[];
-};
-
-type ReactListPaginationPageScope = ReactListPaginationScope & {
-  isActive: boolean;
-};
-
-type ReactListPaginationProps = {
-  pageLinks?: number;
-  children?: (scope: ReactListPaginationScope) => ReactNode;
-  renderFirst?: (scope: ReactListPaginationScope) => ReactNode;
-  renderPrev?: (scope: ReactListPaginationScope) => ReactNode;
-  renderPages?: (scope: ReactListPaginationScope) => ReactNode;
-  renderPage?: (scope: ReactListPaginationPageScope) => ReactNode;
-  renderNext?: (scope: ReactListPaginationScope) => ReactNode;
-  renderLast?: (scope: ReactListPaginationScope) => ReactNode;
-};
-
 export const ReactListPagination = memo(
   ({
     children,
@@ -47,7 +11,7 @@ export const ReactListPagination = memo(
     renderPage,
     renderNext,
     renderLast,
-  }: ReactListPaginationProps) => {
+  }) => {
     const { listState } = useListContext();
     const { data, count, pagination, setPage, loader, error } = listState;
     const { page, perPage } = pagination;
@@ -85,7 +49,7 @@ export const ReactListPagination = memo(
       [setPage, page, paginationState.pagesCount]
     );
 
-    const scope = useMemo<ReactListPaginationScope>(
+    const scope = useMemo(
       () => ({
         page,
         perPage,
@@ -107,7 +71,9 @@ export const ReactListPagination = memo(
       return null;
     }
 
-    if (children) return children(scope);
+    if (children) {
+      return children(scope);
+    }
 
     return (
       <div className="react-list-pagination">
@@ -144,7 +110,7 @@ export const ReactListPagination = memo(
               const pageScope = { ...scope, page: pageNum, isActive };
 
               return renderPage ? (
-                renderPage(pageScope as ReactListPaginationPageScope)
+                renderPage(pageScope)
               ) : (
                 <div key={`page-${pageNum}`}>
                   {isActive ? (

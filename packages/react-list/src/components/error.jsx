@@ -1,14 +1,7 @@
 import { memo } from "react";
-import type { ReactNode } from "react";
 import { useListContext } from "../context/list-provider";
 
-type ReactListErrorProps = {
-  children?:
-    | ReactNode
-    | ((scope: { error: Error }) => ReactNode);
-};
-
-export const ReactListError = memo(({ children }: ReactListErrorProps) => {
+export const ReactListError = memo(({ children }) => {
   const { listState } = useListContext();
   const { error, loader } = listState;
   const { isLoading } = loader;
