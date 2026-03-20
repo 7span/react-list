@@ -1,7 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { useListContext } from "../context/list-provider";
 import { hasActiveFilters } from "./utils";
 import { isEqual } from "../utils";
+import type {
+  ReactListAttrSettings,
+  ReactListFilters,
+  ReactListItem,
+  ReactListItemId,
+  ReactListListState,
+  ReactListProps,
+  ReactListResponse,
+  ReactListSortOrder,
+} from "../types";
 
 /**
  * ReactList component for handling data fetching, pagination, and state management
@@ -24,15 +35,33 @@ const ReactList = ({
   onResponse,
   afterPageChange,
   afterLoadMore,
-}) => {
+}: ReactListProps) => {
   const { requestHandler, setListState, stateManager } = useListContext();
 
   const initRef = useRef(false);
 
   const isLoadMore = paginationMode === "loadMore";
 
+  type ReactListInternalState = {
+    page: number;
+    perPage: number;
+    sortBy: string;
+    sortOrder: ReactListSortOrder;
+    search: string;
+    filters: ReactListFilters;
+    attrSettings: ReactListAttrSettings;
+    items: ReactListItem[];
+    selection: ReactListItemId[];
+    error: Error | null;
+    response: ReactListResponse<ReactListItem> | null;
+    count: number;
+    isLoading: boolean;
+    initializingState: boolean;
+    confirmedPage: number | null;
+  };
+
   const getContext = useCallback(
-    (currentState) => {
+    (currentState?: Partial<ReactListInternalState> | null) => {
       return {
         endpoint,
         version,
@@ -47,7 +76,17 @@ const ReactList = ({
         isRefresh: false,
       };
     },
-    [endpoint, version, meta, search, page, perPage, sortBy, sortOrder, filters]
+    [
+      endpoint,
+      version,
+      meta,
+      search,
+      page,
+      perPage,
+      sortBy,
+      sortOrder,
+      filters,
+    ],
   );
 
   const getSavedState = useCallback(() => {
@@ -111,16 +150,16 @@ const ReactList = ({
   ]);
 
   // Initialize state with default values
-  const [state, setState] = useState(initializeState);
+  const [state, setState] = useState<ReactListInternalState>(initializeState);
 
   const updateStateManager = useCallback(
-    (stateToSave) => {
+    (stateToSave: ReactListInternalState) => {
       if (stateManager) {
         const context = getContext(stateToSave);
         stateManager?.set?.(context);
       }
     },
-    [stateManager, getContext]
+    [stateManager, getContext],
   );
 
   /**
@@ -129,7 +168,10 @@ const ReactList = ({
    * @param {Object} newState - New state to use for the request
    */
   const fetchData = useCallback(
-    async (addContext = {}, newState = null) => {
+    async (
+      addContext: Record<string, unknown> = {},
+      newState: ReactListInternalState | null = null,
+    ) => {
       // Only set loading state if not initializing
       if (!state.initializingState) {
         setState((prev) => ({ ...prev, error: null, isLoading: true }));
@@ -195,7 +237,7 @@ const ReactList = ({
         throw err;
       }
     },
-    [endpoint, version, isLoadMore, meta, requestHandler, state]
+    [endpoint, version, isLoadMore, meta, requestHandler, state],
   );
 
   /**
@@ -203,14 +245,10 @@ const ReactList = ({
    */
   const handlers = useMemo(
     () => ({
-      setPage: (value, addContext) => {
-        let newPage = value;
-        if (value === 0) {
-          newPage = "";
-        }
-        const newState = { ...state, page: newPage };
+      setPage: (value, addContext = {}) => {
+        const newState = { ...state, page: value };
         setState(newState);
-        if (newPage) fetchData(addContext, newState);
+        if (newState.page) fetchData(addContext, newState);
       },
 
       setPerPage: (value) => {
@@ -263,6 +301,19 @@ const ReactList = ({
         setState(newState);
         fetchData({}, newState);
       },
+      updateAttr: (attrName, settingKey, value) => {
+        const attrSettings = {
+          ...(state.attrSettings || {}),
+          [attrName]: {
+            ...(state.attrSettings?.[attrName] || {}),
+            [settingKey]: value,
+          },
+        };
+
+        const newState = { ...state, attrSettings };
+        setState(newState);
+        updateStateManager(newState);
+      },
       updateItemById: (item, id) => {
         const newItems = state.items.map((i) => {
           if (i.id === id) {
@@ -274,7 +325,7 @@ const ReactList = ({
       },
       setSelection: (selection) => setState((prev) => ({ ...prev, selection })),
     }),
-    [fetchData, isLoadMore, state]
+    [fetchData, isLoadMore, state, updateStateManager],
   );
 
   /**
@@ -300,7 +351,13 @@ const ReactList = ({
       hasActiveFilters: hasActiveFilters(state.filters, filters),
       search: state.search,
       filters: state.filters,
-      attrs: attrs || Object.keys(state.items[0] || {}),
+      attrSettings: state.attrSettings || {},
+      attrs: Array.isArray(attrs)
+        ? attrs.map((a) => (typeof a === "string" ? { name: a, label: a } : a))
+        : Object.keys(state.items[0] || {}).map((key) => ({
+            name: key,
+            label: key,
+          })),
       isEmpty: state.items.length === 0,
       ...handlers,
     }),
@@ -320,7 +377,8 @@ const ReactList = ({
       state.filters,
       handlers,
       attrs,
-    ]
+      state.attrSettings,
+    ],
   );
 
   useEffect(() => {
