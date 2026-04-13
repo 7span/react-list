@@ -17,56 +17,73 @@ type ReactListItemsScope = {
 };
 
 type ReactListItemsProps = {
-  children?:
-    | ReactNode
-    | ((scope: ReactListItemsScope) => ReactNode);
+  children?: ReactNode | ((scope: ReactListItemsScope) => ReactNode);
   renderItem?: (args: { item: ReactListItem; index: number }) => ReactNode;
 };
 
-export const ReactListItems = memo(({ children, renderItem }: ReactListItemsProps) => {
-  const { listState } = useListContext();
-  const { data: items = [], loader, error, setSort, sort } = listState;
-  const { initialLoading, isLoading } = loader;
-
-  const scope = useMemo(
-    () => ({
-      items,
-      isLoading,
+export const ReactListItems = memo(
+  ({ children, renderItem }: ReactListItemsProps) => {
+    const { listState } = useListContext();
+    const {
+      data: items = [],
+      loader,
+      error,
       setSort,
       sort,
-    }),
-    [items, sort, setSort, isLoading]
-  );
+      pagination,
+    } = listState;
+    const { initialLoading, isLoading } = loader;
+    const { page, perPage } = pagination;
 
-  if (initialLoading) return null;
+    const serializedItems = useMemo(() => {
+      return items.map((item, index) => {
+        return {
+          ...item,
+          _index: (page - 1) * perPage + index + 1,
+        };
+      });
+    }, [items, page, perPage]);
 
-  if (!items || items.length === 0) {
-    return null;
-  }
+    const scope = useMemo(
+      () => ({
+        items: serializedItems,
+        isLoading,
+        setSort,
+        sort,
+      }),
+      [items, sort, setSort, isLoading, serializedItems],
+    );
 
-  if (error) {
-    return null;
-  }
+    if (initialLoading) return null;
 
-  if (renderItem) {
+    if (!items || items.length === 0) {
+      return null;
+    }
+
+    if (error) {
+      return null;
+    }
+
+    if (renderItem) {
+      return (
+        <div className="react-list-items">
+          {items.map((item, index) => (
+            <div key={item.id || index}>{renderItem({ item, index })}</div>
+          ))}
+        </div>
+      );
+    }
+
+    if (typeof children === "function") {
+      return <div className="react-list-items">{children(scope)}</div>;
+    }
+
     return (
       <div className="react-list-items">
         {items.map((item, index) => (
-          <div key={item.id || index}>{renderItem({ item, index })}</div>
+          <pre key={item.id || index}>{JSON.stringify(item, null, 2)}</pre>
         ))}
       </div>
     );
-  }
-
-  if (typeof children === "function") {
-    return <div className="react-list-items">{children(scope)}</div>;
-  }
-
-  return (
-    <div className="react-list-items">
-      {items.map((item, index) => (
-        <pre key={item.id || index}>{JSON.stringify(item, null, 2)}</pre>
-      ))}
-    </div>
-  );
-});
+  },
+);
