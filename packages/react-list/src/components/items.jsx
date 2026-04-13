@@ -3,17 +3,34 @@ import { useListContext } from "../context/list-provider";
 
 export const ReactListItems = memo(({ children, renderItem }) => {
   const { listState } = useListContext();
-  const { data: items = [], loader, error, setSort, sort } = listState;
+  const {
+    data: items = [],
+    loader,
+    error,
+    setSort,
+    sort,
+    pagination,
+  } = listState;
   const { initialLoading, isLoading } = loader;
+  const { page, perPage } = pagination;
+
+  const serializedItems = useMemo(() => {
+    return items.map((item, index) => {
+      return {
+        ...item,
+        _index: (page - 1) * perPage + index + 1,
+      };
+    });
+  }, [items, page, perPage]);
 
   const scope = useMemo(
     () => ({
-      items,
+      items: serializedItems,
       isLoading,
       setSort,
       sort,
     }),
-    [items, sort, setSort, isLoading]
+    [items, sort, setSort, isLoading, serializedItems],
   );
 
   if (initialLoading) return null;
